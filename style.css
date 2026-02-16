@@ -12,6 +12,7 @@ body {
   justify-content: center;
   font-family: "Segoe UI", system-ui, sans-serif;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .clock {
@@ -28,25 +29,28 @@ body {
   justify-content: center;
 }
 
-/* ⬛ BOX-SHAPED LOADING RING */
+/* ⬛ BOX-SHAPED LOADER */
 .loader-box {
   position: absolute;
   inset: -16px;
   border-radius: 30px;
-  background:
-    linear-gradient(90deg,
-      transparent 0%,
-      rgba(255,255,255,0.9) 50%,
-      transparent 100%);
-  animation: orbit 2.6s linear infinite;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.9) 50%,
+    transparent 100%
+  );
+  padding: 3px;
   opacity: 0.9;
+  animation: orbit 2.6s linear infinite;
+  animation-play-state: paused;
+
   mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
-  padding: 3px;
   mask-composite: exclude;
   -webkit-mask-composite: xor;
 }
@@ -82,7 +86,6 @@ body {
   color: rgba(255, 255, 255, 0.6);
 }
 
-/* 🔄 ANIMATION */
 @keyframes orbit {
   to {
     transform: rotate(360deg);
