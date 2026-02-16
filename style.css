@@ -109,3 +109,19 @@ body {
   border-radius: 20px;
   padding: 20px;
 }
+
+/* EXPORT / IMPORT */
+.analytics-actions {
+  margin-top: 28px;
+  display: flex;
+  gap: 12px;
+}
+
+.analytics-actions button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  cursor: pointer;
+}
