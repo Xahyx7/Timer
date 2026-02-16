@@ -3,13 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Focus Ring</title>
+  <title>Focus Clock</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <div class="ring"></div>
-    <div class="time">00:00:00</div>
+  <div class="clock">
+    <div class="box">
+      <span class="number" id="hh">00</span>
+      <span class="label">HOURS</span>
+    </div>
+
+    <div class="box">
+      <span class="number" id="mm">00</span>
+      <span class="label">MINUTES</span>
+    </div>
+
+    <div class="box">
+      <span class="number" id="ss">00</span>
+      <span class="label">SECONDS</span>
+    </div>
   </div>
 </body>
 </html>
