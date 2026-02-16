@@ -6,18 +6,17 @@
 
 body {
   height: 100vh;
-  background: radial-gradient(circle at top, #1a0f2e, #05010a);
+  background: radial-gradient(circle at top, #12081f, #05010a);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: "Segoe UI", system-ui, sans-serif;
-  overflow: hidden;
   cursor: pointer;
 }
 
 .clock {
   display: flex;
-  gap: 36px;
+  gap: 40px;
 }
 
 .box-wrap {
@@ -29,37 +28,29 @@ body {
   justify-content: center;
 }
 
-/* ⬛ BOX LOADER */
-.loader-box {
+/* 🔥 WAVY SQUARE LOADER */
+.loader {
   position: absolute;
-  inset: -16px;
-  border-radius: 30px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255,255,255,0.9) 50%,
-    transparent 100%
-  );
-  padding: 3px;
-  opacity: 0.9;
-  animation: orbit 2.6s linear infinite;
+  width: 260px;
+  height: 260px;
+  transform-origin: center;
+  animation: rotate 6s linear infinite;
   animation-play-state: paused;
+}
 
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  mask-composite: exclude;
-  -webkit-mask-composite: xor;
+.loader rect {
+  fill: none;
+  stroke: rgba(255,255,255,0.9);
+  stroke-width: 3.5;
+  stroke-dasharray: 14 10;
+  stroke-linecap: round;
 }
 
 /* 📦 CLOCK BOX */
 .box {
   width: 180px;
   height: 220px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255,255,255,0.06);
   backdrop-filter: blur(12px);
   border-radius: 24px;
   display: flex;
@@ -69,24 +60,23 @@ body {
   box-shadow:
     0 20px 40px rgba(0, 0, 0, 0.6),
     inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-  z-index: 1;
+  z-index: 2;
 }
 
 .number {
   font-size: 4.2rem;
   font-weight: 700;
   color: #ffffff;
-  letter-spacing: 2px;
 }
 
 .label {
   margin-top: 12px;
   font-size: 0.75rem;
   letter-spacing: 2px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255,255,255,0.6);
 }
 
-@keyframes orbit {
+@keyframes rotate {
   to {
     transform: rotate(360deg);
   }
