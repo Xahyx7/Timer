@@ -1,6 +1,7 @@
 const hh = document.getElementById("hh");
 const mm = document.getElementById("mm");
 const ss = document.getElementById("ss");
+const loaders = document.querySelectorAll(".loader");
 const rects = document.querySelectorAll(".loader rect");
 
 const overlay = document.getElementById("overlay");
@@ -17,6 +18,11 @@ let startTime = null;
 let elapsed = 0;
 let rafId = null;
 
+/* 🔁 LOADER ENABLED STATE */
+let loaderEnabled = localStorage.getItem("loader-enabled");
+loaderEnabled = loaderEnabled === null ? true : loaderEnabled === "true";
+applyLoaderState();
+
 /* TIMER */
 function render(ms) {
   const s = Math.floor(ms / 1000);
@@ -27,7 +33,7 @@ function render(ms) {
 
 function start() {
   startTime = Date.now() - elapsed;
-  rects.forEach(r => r.style.animationPlayState = "running");
+  if (loaderEnabled) rects.forEach(r => r.style.animationPlayState = "running");
   loop();
 }
 
@@ -122,6 +128,14 @@ importFile.onchange = e => {
   reader.readAsText(file);
 };
 
+/* 🔲 APPLY LOADER STATE */
+function applyLoaderState() {
+  loaders.forEach(l => {
+    l.classList.toggle("hidden", !loaderEnabled);
+  });
+  localStorage.setItem("loader-enabled", loaderEnabled);
+}
+
 /* EVENTS */
 document.body.addEventListener("click", () => {
   if (overlay.classList.contains("show")) return;
@@ -147,6 +161,10 @@ document.addEventListener("keydown", e => {
   if (e.key.toLowerCase() === "a") {
     loadAnalytics();
     overlay.classList.toggle("show");
+  }
+  if (e.key.toLowerCase() === "p") {
+    loaderEnabled = !loaderEnabled;
+    applyLoaderState();
   }
 });
 
