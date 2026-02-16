@@ -1,6 +1,8 @@
 const hh = document.getElementById("hh");
 const mm = document.getElementById("mm");
 const ss = document.getElementById("ss");
+
+const loaders = document.querySelectorAll(".loader");
 const rects = document.querySelectorAll(".loader rect");
 
 const overlay = document.getElementById("overlay");
@@ -9,13 +11,30 @@ const weekEl = document.getElementById("weekData");
 const yearEl = document.getElementById("yearData");
 
 let running = false;
-let startTime = null;        // timestamp when session started/resumed
-let elapsed = 0;            // ms in current session
-let lastTickDate = null;    // YYYY-MM-DD of last tick
+let startTime = null;
+let elapsed = 0;
+let lastTickDate = null;
 let rafId = null;
-let dirtySession = false;   // not yet saved
+let dirtySession = false;
 
-/* ------------------ TIMER DISPLAY ------------------ */
+/* ---------------- LOADER TOGGLE (P) ---------------- */
+let loaderEnabled = localStorage.getItem("loader-enabled");
+loaderEnabled = loaderEnabled === null ? true : loaderEnabled === "true";
+
+function applyLoaderState() {
+  loaders.forEach(l => l.style.display = loaderEnabled ? "block" : "none");
+  localStorage.setItem("loader-enabled", loaderEnabled);
+}
+applyLoaderState();
+
+/* ---------------- DATE HELPERS (LOCAL, NOT UTC) ---------------- */
+function localDateString(date = new Date()) {
+  return date.getFullYear() + "-" +
+    String(date.getMonth() + 1).padStart(2, "0") + "-" +
+    String(date.getDate()).padStart(2, "0");
+}
+
+/* ---------------- DISPLAY ---------------- */
 function render(ms) {
   const s = Math.floor(ms / 1000);
   hh.textContent = String(Math.floor(s / 3600)).padStart(2, "0");
@@ -23,59 +42,62 @@ function render(ms) {
   ss.textContent = String(s % 60).padStart(2, "0");
 }
 
-/* ------------------ START ------------------ */
+/* ---------------- START ---------------- */
 function start() {
-  const now = Date.now();
-  startTime = now - elapsed;
-  lastTickDate = currentDate();
+  startTime = Date.now() - elapsed;
+  lastTickDate = localDateString();
   dirtySession = true;
-  rects.forEach(r => r.style.animationPlayState = "running");
+  if (loaderEnabled) rects.forEach(r => r.style.animationPlayState = "running");
   loop();
 }
 
-/* ------------------ PAUSE (NO SAVE) ------------------ */
+/* ---------------- PAUSE (NO SAVE) ---------------- */
 function pause() {
   cancelAnimationFrame(rafId);
   elapsed = Date.now() - startTime;
   rects.forEach(r => r.style.animationPlayState = "paused");
 }
 
-/* ------------------ RESET (SAVE) ------------------ */
+/* ---------------- RESET (SAVE) ---------------- */
 function reset() {
   cancelAnimationFrame(rafId);
+
   if (dirtySession && elapsed > 0) {
-    saveSession();   // ✅ ONLY SAVE HERE
+    saveToDate(lastTickDate, elapsed);
   }
+
   running = false;
   elapsed = 0;
   startTime = null;
   dirtySession = false;
+
   rects.forEach(r => {
     r.style.animationPlayState = "paused";
     r.style.strokeDashoffset = "0";
   });
+
   render(0);
 }
 
-/* ------------------ LOOP + MIDNIGHT SPLIT ------------------ */
+/* ---------------- LOOP + MIDNIGHT SPLIT ---------------- */
 function loop() {
   rafId = requestAnimationFrame(loop);
 
   const now = Date.now();
   elapsed = now - startTime;
 
-  const today = currentDate();
+  const today = localDateString();
   if (today !== lastTickDate) {
-    // 🔥 MIDNIGHT CROSSED
-    const midnight = new Date(today + "T00:00:00").getTime();
-    const beforeMidnight = midnight - startTime;
+    // crossed local midnight
+    const midnight = new Date();
+    midnight.setHours(0, 0, 0, 0);
 
+    const beforeMidnight = midnight.getTime() - startTime;
     if (beforeMidnight > 0) {
       saveToDate(lastTickDate, beforeMidnight);
     }
 
-    // reset session for new day
-    startTime = midnight;
+    startTime = midnight.getTime();
     elapsed = now - startTime;
     lastTickDate = today;
   }
@@ -83,26 +105,18 @@ function loop() {
   render(elapsed);
 }
 
-/* ------------------ SAVE HELPERS ------------------ */
-function currentDate() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function saveSession() {
-  saveToDate(lastTickDate, elapsed);
-}
-
+/* ---------------- STORAGE ---------------- */
 function saveToDate(date, ms) {
   const data = JSON.parse(localStorage.getItem("focus-time") || "{}");
   data[date] = (data[date] || 0) + ms;
   localStorage.setItem("focus-time", JSON.stringify(data));
 }
 
-/* ------------------ ANALYTICS ------------------ */
+/* ---------------- ANALYTICS ---------------- */
 function loadAnalytics() {
   const data = JSON.parse(localStorage.getItem("focus-time") || "{}");
 
-  const today = currentDate();
+  const today = localDateString();
   const t = data[today] || 0;
   todayEl.textContent =
     `${Math.floor(t / 3600000)}h ${Math.floor((t % 3600000) / 60000)}m`;
@@ -111,7 +125,7 @@ function loadAnalytics() {
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    const k = d.toISOString().slice(0, 10);
+    const k = localDateString(d);
     weekEl.innerHTML +=
       `<li>${d.toLocaleDateString(undefined, { weekday: "short" })}: ${Math.floor((data[k] || 0) / 60000)}m</li>`;
   }
@@ -128,7 +142,7 @@ function loadAnalytics() {
   });
 }
 
-/* ------------------ EVENTS ------------------ */
+/* ---------------- EVENTS ---------------- */
 document.body.addEventListener("click", () => {
   if (overlay.classList.contains("show")) return;
   running = !running;
@@ -137,7 +151,7 @@ document.body.addEventListener("click", () => {
 
 document.body.addEventListener("dblclick", reset);
 
-// analytics open
+/* analytics open */
 let holdTimer;
 document.body.addEventListener("mousedown", () => {
   holdTimer = setTimeout(() => {
@@ -155,9 +169,13 @@ document.addEventListener("keydown", e => {
     loadAnalytics();
     overlay.classList.toggle("show");
   }
+  if (e.key.toLowerCase() === "p") {
+    loaderEnabled = !loaderEnabled;
+    applyLoaderState();
+  }
 });
 
-/* ⚠️ WARN BEFORE LEAVING WITH UNSAVED SESSION */
+/* warn before leaving */
 window.addEventListener("beforeunload", e => {
   if (dirtySession && elapsed > 0) {
     e.preventDefault();
