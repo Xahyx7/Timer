@@ -12,7 +12,7 @@
   <div class="clock">
     <div class="box-wrap">
       <svg class="loader" viewBox="0 0 120 120">
-        <rect x="10" y="10" width="100" height="100" rx="22"/>
+        <rect x="10" y="10" width="100" height="100" rx="22" ry="22"/>
       </svg>
       <div class="box">
         <span class="number" id="hh">00</span>
@@ -22,7 +22,7 @@
 
     <div class="box-wrap">
       <svg class="loader" viewBox="0 0 120 120">
-        <rect x="10" y="10" width="100" height="100" rx="22"/>
+        <rect x="10" y="10" width="100" height="100" rx="22" ry="22"/>
       </svg>
       <div class="box">
         <span class="number" id="mm">00</span>
@@ -32,7 +32,7 @@
 
     <div class="box-wrap">
       <svg class="loader" viewBox="0 0 120 120">
-        <rect x="10" y="10" width="100" height="100" rx="22"/>
+        <rect x="10" y="10" width="100" height="100" rx="22" ry="22"/>
       </svg>
       <div class="box">
         <span class="number" id="ss">00</span>
@@ -44,10 +44,7 @@
   <!-- 📊 ANALYTICS OVERLAY -->
   <div class="overlay" id="overlay">
     <div class="overlay-content">
-      <div class="overlay-header">
-        <h2>Analytics</h2>
-        <button id="closeOverlay">✕</button>
-      </div>
+      <h2>Analytics</h2>
 
       <div class="cards">
         <div class="card">
@@ -65,17 +62,8 @@
           <ul id="yearData"></ul>
         </div>
       </div>
-
-      <div class="actions">
-        <button id="exportBtn">Export Data</button>
-        <button id="importBtn">Import Data</button>
-        <input type="file" id="importFile" hidden />
-      </div>
     </div>
   </div>
-
-  <!-- 📊 OPEN ANALYTICS BUTTON -->
-  <button class="fab" id="openAnalytics">📊</button>
 
   <script src="script.js"></script>
 </body>
