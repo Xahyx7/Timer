@@ -1,7 +1,7 @@
 const hh = document.getElementById("hh");
 const mm = document.getElementById("mm");
 const ss = document.getElementById("ss");
-const loaders = document.querySelectorAll(".loader");
+const rects = document.querySelectorAll(".loader rect");
 
 let running = false;
 let startTime = null;
@@ -17,11 +17,11 @@ function render(ms) {
 
 function start() {
   startTime = Date.now() - elapsed;
-  loaders.forEach(l => {
-    l.style.animation = "none";
-    l.offsetHeight; // FORCE RESET
-    l.style.animation = "rotate 6s linear infinite";
-    l.style.animationPlayState = "running";
+  rects.forEach(r => {
+    r.style.animation = "none";
+    r.offsetHeight; // force reset
+    r.style.animation = "dash 1.6s linear infinite";
+    r.style.animationPlayState = "running";
   });
   loop();
 }
@@ -30,7 +30,7 @@ function pause() {
   cancelAnimationFrame(rafId);
   elapsed = Date.now() - startTime;
   saveTime(elapsed);
-  loaders.forEach(l => l.style.animationPlayState = "paused");
+  rects.forEach(r => r.style.animationPlayState = "paused");
 }
 
 function reset() {
@@ -38,8 +38,9 @@ function reset() {
   running = false;
   elapsed = 0;
   startTime = null;
-  loaders.forEach(l => {
-    l.style.animation = "none";
+  rects.forEach(r => {
+    r.style.animation = "none";
+    r.style.strokeDashoffset = "0";
   });
   render(0);
 }
