@@ -1,33 +1,31 @@
 const hh = document.getElementById("hh");
 const mm = document.getElementById("mm");
 const ss = document.getElementById("ss");
-const loaders = document.querySelectorAll(".loader-box");
+const loaders = document.querySelectorAll(".loader");
 
 let running = false;
 let startTime = null;
 let elapsed = 0;
 let rafId = null;
 
-/* 🔁 RENDER TIME */
 function render(ms) {
-  const totalSeconds = Math.floor(ms / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-
-  hh.textContent = String(hours).padStart(2, "0");
-  mm.textContent = String(minutes).padStart(2, "0");
-  ss.textContent = String(seconds).padStart(2, "0");
+  const s = Math.floor(ms / 1000);
+  hh.textContent = String(Math.floor(s / 3600)).padStart(2, "0");
+  mm.textContent = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+  ss.textContent = String(s % 60).padStart(2, "0");
 }
 
-/* ▶️ START */
 function start() {
   startTime = Date.now() - elapsed;
-  loaders.forEach(l => l.style.animationPlayState = "running");
+  loaders.forEach(l => {
+    l.style.animation = "none";
+    l.offsetHeight; // FORCE RESET
+    l.style.animation = "rotate 6s linear infinite";
+    l.style.animationPlayState = "running";
+  });
   loop();
 }
 
-/* ⏸️ PAUSE */
 function pause() {
   cancelAnimationFrame(rafId);
   elapsed = Date.now() - startTime;
@@ -35,24 +33,23 @@ function pause() {
   loaders.forEach(l => l.style.animationPlayState = "paused");
 }
 
-/* 🔄 RESET */
 function reset() {
   cancelAnimationFrame(rafId);
   running = false;
   elapsed = 0;
   startTime = null;
-  loaders.forEach(l => l.style.animationPlayState = "paused");
+  loaders.forEach(l => {
+    l.style.animation = "none";
+  });
   render(0);
 }
 
-/* 🔁 LOOP */
 function loop() {
   rafId = requestAnimationFrame(loop);
   elapsed = Date.now() - startTime;
   render(elapsed);
 }
 
-/* 💾 SAVE TIME */
 function saveTime(ms) {
   if (ms <= 0) return;
   const today = new Date().toISOString().slice(0, 10);
@@ -61,16 +58,13 @@ function saveTime(ms) {
   localStorage.setItem("focus-time", JSON.stringify(data));
 }
 
-/* 🖱️ CLICK = START / PAUSE */
+/* CLICK = START / PAUSE */
 document.body.addEventListener("click", () => {
   running = !running;
   running ? start() : pause();
 });
 
-/* 🔁 DOUBLE CLICK = RESET */
-document.body.addEventListener("dblclick", () => {
-  reset();
-});
+/* DOUBLE CLICK = RESET */
+document.body.addEventListener("dblclick", reset);
 
-/* INIT */
 render(0);
