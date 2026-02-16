@@ -21,8 +21,8 @@ body {
 
 .box-wrap {
   position: relative;
-  width: 200px;
-  height: 240px;
+  width: 220px;
+  height: 260px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -31,25 +31,24 @@ body {
 /* ⭕ OUTER LOADING RING */
 .loader-ring {
   position: absolute;
-  inset: 0;
+  inset: -14px;
   border-radius: 50%;
-  background:
-    conic-gradient(
-      from 0deg,
-      transparent 0deg,
-      rgba(255,255,255,0.9) 40deg,
-      transparent 80deg
-    );
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(255, 255, 255, 0.9) 40deg,
+    transparent 80deg
+  );
   mask: radial-gradient(
     farthest-side,
-    transparent calc(100% - 6px),
-    #000 calc(100% - 4px)
+    transparent calc(100% - 8px),
+    #000 calc(100% - 6px)
   );
   animation: spin 2.8s linear infinite;
-  opacity: 0.9;
+  opacity: 0.85;
 }
 
-/* 📦 INNER BOX */
+/* 📦 CLOCK BOX */
 .box {
   width: 180px;
   height: 220px;
@@ -80,7 +79,6 @@ body {
   color: rgba(255, 255, 255, 0.6);
 }
 
-/* 🎞️ ANIMATION */
 @keyframes spin {
   to {
     transform: rotate(360deg);
