@@ -148,3 +148,25 @@ body {
 @keyframes cardFade {
   to { opacity: 1; transform: translateY(0); }
 }
+/* keep your existing styles – only ADD this at the bottom */
+
+.analytics-actions {
+  margin-top: 28px;
+  display: flex;
+  gap: 12px;
+}
+
+.analytics-actions button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: background 0.2s ease;
+}
+
+.analytics-actions button:hover {
+  background: rgba(255,255,255,0.25);
+}
