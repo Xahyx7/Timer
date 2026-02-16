@@ -5,61 +5,61 @@
 }
 
 body {
-  width: 100vw;
   height: 100vh;
-  background: #050505;
+  background: radial-gradient(circle at top, #1a0f2e, #05010a);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: "Segoe UI", sans-serif;
-  overflow: hidden;
+  font-family: "Segoe UI", system-ui, sans-serif;
 }
 
-.container {
-  position: relative;
-  width: 320px;
-  height: 320px;
-}
-
-.ring {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    #4facfe,
-    #00f2fe,
-    #4facfe
-  );
-  filter: blur(1px);
-  animation: spin 6s linear infinite;
-}
-
-.ring::before {
-  content: "";
-  position: absolute;
-  inset: 18px;
-  background: #050505;
-  border-radius: 50%;
-}
-
-.time {
-  position: absolute;
-  inset: 0;
+.clock {
   display: flex;
+  gap: 24px;
+}
+
+.box {
+  width: 180px;
+  height: 220px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 2.4rem;
-  font-weight: 500;
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  animation: float 6s ease-in-out infinite;
+}
+
+.box:nth-child(2) {
+  animation-delay: 0.5s;
+}
+.box:nth-child(3) {
+  animation-delay: 1s;
+}
+
+.number {
+  font-size: 4.2rem;
+  font-weight: 700;
   color: #ffffff;
   letter-spacing: 2px;
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
+.label {
+  margin-top: 12px;
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
   }
-  to {
-    transform: rotate(360deg);
+  50% {
+    transform: translateY(-6px);
   }
 }
