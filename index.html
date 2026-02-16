@@ -8,11 +8,11 @@
 </head>
 <body>
 
-  <!-- ⏱️ CLOCK -->
+  <!-- CLOCK -->
   <div class="clock">
     <div class="box-wrap">
       <svg class="loader" viewBox="0 0 120 120">
-        <rect x="10" y="10" width="100" height="100" rx="22" ry="22"/>
+        <rect x="10" y="10" width="100" height="100" rx="22"/>
       </svg>
       <div class="box">
         <span class="number" id="hh">00</span>
@@ -22,7 +22,7 @@
 
     <div class="box-wrap">
       <svg class="loader" viewBox="0 0 120 120">
-        <rect x="10" y="10" width="100" height="100" rx="22" ry="22"/>
+        <rect x="10" y="10" width="100" height="100" rx="22"/>
       </svg>
       <div class="box">
         <span class="number" id="mm">00</span>
@@ -32,7 +32,7 @@
 
     <div class="box-wrap">
       <svg class="loader" viewBox="0 0 120 120">
-        <rect x="10" y="10" width="100" height="100" rx="22" ry="22"/>
+        <rect x="10" y="10" width="100" height="100" rx="22"/>
       </svg>
       <div class="box">
         <span class="number" id="ss">00</span>
@@ -41,7 +41,7 @@
     </div>
   </div>
 
-  <!-- 📊 ANALYTICS OVERLAY -->
+  <!-- ANALYTICS OVERLAY -->
   <div class="overlay" id="overlay">
     <div class="overlay-content">
       <h2>Analytics</h2>
@@ -61,6 +61,13 @@
           <h3>This Year</h3>
           <ul id="yearData"></ul>
         </div>
+      </div>
+
+      <!-- ✅ NEW: EXPORT / IMPORT (INSIDE ANALYTICS ONLY) -->
+      <div class="analytics-actions">
+        <button id="exportBtn">Export</button>
+        <button id="importBtn">Import</button>
+        <input type="file" id="importFile" hidden />
       </div>
     </div>
   </div>
