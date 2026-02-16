@@ -1,7 +1,6 @@
 const hh = document.getElementById("hh");
 const mm = document.getElementById("mm");
 const ss = document.getElementById("ss");
-const loaders = document.querySelectorAll(".loader");
 const rects = document.querySelectorAll(".loader rect");
 
 const overlay = document.getElementById("overlay");
@@ -9,46 +8,48 @@ const todayEl = document.getElementById("todayTime");
 const weekEl = document.getElementById("weekData");
 const yearEl = document.getElementById("yearData");
 
-const exportBtn = document.getElementById("exportBtn");
-const importBtn = document.getElementById("importBtn");
-const importFile = document.getElementById("importFile");
-
 let running = false;
-let startTime = null;
-let elapsed = 0;
+let startTime = null;        // timestamp when session started/resumed
+let elapsed = 0;            // ms in current session
+let lastTickDate = null;    // YYYY-MM-DD of last tick
 let rafId = null;
+let dirtySession = false;   // not yet saved
 
-/* 🔁 LOADER ENABLED STATE */
-let loaderEnabled = localStorage.getItem("loader-enabled");
-loaderEnabled = loaderEnabled === null ? true : loaderEnabled === "true";
-applyLoaderState();
-
-/* TIMER */
+/* ------------------ TIMER DISPLAY ------------------ */
 function render(ms) {
   const s = Math.floor(ms / 1000);
-  hh.textContent = String(Math.floor(s / 3600)).padStart(2,"0");
-  mm.textContent = String(Math.floor((s % 3600) / 60)).padStart(2,"0");
-  ss.textContent = String(s % 60).padStart(2,"0");
+  hh.textContent = String(Math.floor(s / 3600)).padStart(2, "0");
+  mm.textContent = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+  ss.textContent = String(s % 60).padStart(2, "0");
 }
 
+/* ------------------ START ------------------ */
 function start() {
-  startTime = Date.now() - elapsed;
-  if (loaderEnabled) rects.forEach(r => r.style.animationPlayState = "running");
+  const now = Date.now();
+  startTime = now - elapsed;
+  lastTickDate = currentDate();
+  dirtySession = true;
+  rects.forEach(r => r.style.animationPlayState = "running");
   loop();
 }
 
+/* ------------------ PAUSE (NO SAVE) ------------------ */
 function pause() {
   cancelAnimationFrame(rafId);
   elapsed = Date.now() - startTime;
-  saveTime(elapsed);
   rects.forEach(r => r.style.animationPlayState = "paused");
 }
 
+/* ------------------ RESET (SAVE) ------------------ */
 function reset() {
   cancelAnimationFrame(rafId);
+  if (dirtySession && elapsed > 0) {
+    saveSession();   // ✅ ONLY SAVE HERE
+  }
   running = false;
   elapsed = 0;
   startTime = null;
+  dirtySession = false;
   rects.forEach(r => {
     r.style.animationPlayState = "paused";
     r.style.strokeDashoffset = "0";
@@ -56,87 +57,78 @@ function reset() {
   render(0);
 }
 
+/* ------------------ LOOP + MIDNIGHT SPLIT ------------------ */
 function loop() {
   rafId = requestAnimationFrame(loop);
-  elapsed = Date.now() - startTime;
+
+  const now = Date.now();
+  elapsed = now - startTime;
+
+  const today = currentDate();
+  if (today !== lastTickDate) {
+    // 🔥 MIDNIGHT CROSSED
+    const midnight = new Date(today + "T00:00:00").getTime();
+    const beforeMidnight = midnight - startTime;
+
+    if (beforeMidnight > 0) {
+      saveToDate(lastTickDate, beforeMidnight);
+    }
+
+    // reset session for new day
+    startTime = midnight;
+    elapsed = now - startTime;
+    lastTickDate = today;
+  }
+
   render(elapsed);
 }
 
-/* STORAGE */
-function saveTime(ms) {
-  if (ms <= 0) return;
-  const d = new Date().toISOString().slice(0,10);
+/* ------------------ SAVE HELPERS ------------------ */
+function currentDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function saveSession() {
+  saveToDate(lastTickDate, elapsed);
+}
+
+function saveToDate(date, ms) {
   const data = JSON.parse(localStorage.getItem("focus-time") || "{}");
-  data[d] = (data[d] || 0) + ms;
+  data[date] = (data[date] || 0) + ms;
   localStorage.setItem("focus-time", JSON.stringify(data));
 }
 
-/* ANALYTICS */
+/* ------------------ ANALYTICS ------------------ */
 function loadAnalytics() {
   const data = JSON.parse(localStorage.getItem("focus-time") || "{}");
 
-  const today = new Date().toISOString().slice(0,10);
+  const today = currentDate();
   const t = data[today] || 0;
   todayEl.textContent =
-    `${Math.floor(t/3600000)}h ${Math.floor((t%3600000)/60000)}m`;
+    `${Math.floor(t / 3600000)}h ${Math.floor((t % 3600000) / 60000)}m`;
 
   weekEl.innerHTML = "";
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    const k = d.toISOString().slice(0,10);
+    const k = d.toISOString().slice(0, 10);
     weekEl.innerHTML +=
-      `<li>${d.toLocaleDateString(undefined,{weekday:"short"})}: ${Math.floor((data[k]||0)/60000)}m</li>`;
+      `<li>${d.toLocaleDateString(undefined, { weekday: "short" })}: ${Math.floor((data[k] || 0) / 60000)}m</li>`;
   }
 
   yearEl.innerHTML = "";
   const months = {};
   Object.keys(data).forEach(k => {
-    const m = k.slice(0,7);
+    const m = k.slice(0, 7);
     months[m] = (months[m] || 0) + data[k];
   });
   Object.keys(months).forEach(m => {
     yearEl.innerHTML +=
-      `<li>${m}: ${Math.floor(months[m]/3600000)}h</li>`;
+      `<li>${m}: ${Math.floor(months[m] / 3600000)}h</li>`;
   });
 }
 
-/* EXPORT / IMPORT */
-exportBtn.onclick = () => {
-  const data = localStorage.getItem("focus-time");
-  if (!data) return alert("No data to export");
-  const blob = new Blob([data], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "focus-analytics.json";
-  a.click();
-};
-
-importBtn.onclick = () => importFile.click();
-
-importFile.onchange = e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    if (confirm("Overwrite existing analytics?")) {
-      localStorage.setItem("focus-time", reader.result);
-      loadAnalytics();
-      alert("Import successful");
-    }
-  };
-  reader.readAsText(file);
-};
-
-/* 🔲 APPLY LOADER STATE */
-function applyLoaderState() {
-  loaders.forEach(l => {
-    l.classList.toggle("hidden", !loaderEnabled);
-  });
-  localStorage.setItem("loader-enabled", loaderEnabled);
-}
-
-/* EVENTS */
+/* ------------------ EVENTS ------------------ */
 document.body.addEventListener("click", () => {
   if (overlay.classList.contains("show")) return;
   running = !running;
@@ -145,6 +137,7 @@ document.body.addEventListener("click", () => {
 
 document.body.addEventListener("dblclick", reset);
 
+// analytics open
 let holdTimer;
 document.body.addEventListener("mousedown", () => {
   holdTimer = setTimeout(() => {
@@ -162,9 +155,13 @@ document.addEventListener("keydown", e => {
     loadAnalytics();
     overlay.classList.toggle("show");
   }
-  if (e.key.toLowerCase() === "p") {
-    loaderEnabled = !loaderEnabled;
-    applyLoaderState();
+});
+
+/* ⚠️ WARN BEFORE LEAVING WITH UNSAVED SESSION */
+window.addEventListener("beforeunload", e => {
+  if (dirtySession && elapsed > 0) {
+    e.preventDefault();
+    e.returnValue = "";
   }
 });
 
