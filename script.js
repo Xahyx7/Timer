@@ -8,6 +8,10 @@ const todayEl = document.getElementById("todayTime");
 const weekEl = document.getElementById("weekData");
 const yearEl = document.getElementById("yearData");
 
+const exportBtn = document.getElementById("exportBtn");
+const importBtn = document.getElementById("importBtn");
+const importFile = document.getElementById("importFile");
+
 let running = false;
 let startTime = null;
 let elapsed = 0;
@@ -67,14 +71,16 @@ function loadAnalytics() {
 
   const today = new Date().toISOString().slice(0,10);
   const t = data[today] || 0;
-  todayEl.textContent = `${Math.floor(t/3600000)}h ${Math.floor((t%3600000)/60000)}m`;
+  todayEl.textContent =
+    `${Math.floor(t/3600000)}h ${Math.floor((t%3600000)/60000)}m`;
 
   weekEl.innerHTML = "";
-  for (let i=6;i>=0;i--) {
+  for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
     const k = d.toISOString().slice(0,10);
-    weekEl.innerHTML += `<li>${d.toLocaleDateString(undefined,{weekday:"short"})}: ${Math.floor((data[k]||0)/60000)}m</li>`;
+    weekEl.innerHTML +=
+      `<li>${d.toLocaleDateString(undefined,{weekday:"short"})}: ${Math.floor((data[k]||0)/60000)}m</li>`;
   }
 
   yearEl.innerHTML = "";
@@ -84,9 +90,37 @@ function loadAnalytics() {
     months[m] = (months[m] || 0) + data[k];
   });
   Object.keys(months).forEach(m => {
-    yearEl.innerHTML += `<li>${m}: ${Math.floor(months[m]/3600000)}h</li>`;
+    yearEl.innerHTML +=
+      `<li>${m}: ${Math.floor(months[m]/3600000)}h</li>`;
   });
 }
+
+/* EXPORT / IMPORT */
+exportBtn.onclick = () => {
+  const data = localStorage.getItem("focus-time");
+  if (!data) return alert("No data to export");
+  const blob = new Blob([data], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "focus-analytics.json";
+  a.click();
+};
+
+importBtn.onclick = () => importFile.click();
+
+importFile.onchange = e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    if (confirm("Overwrite existing analytics?")) {
+      localStorage.setItem("focus-time", reader.result);
+      loadAnalytics();
+      alert("Import successful");
+    }
+  };
+  reader.readAsText(file);
+};
 
 /* EVENTS */
 document.body.addEventListener("click", () => {
