@@ -29,7 +29,7 @@ body {
   justify-content: center;
 }
 
-/* ⬛ BOX-SHAPED LOADER */
+/* ⬛ BOX LOADER */
 .loader-box {
   position: absolute;
   inset: -16px;
