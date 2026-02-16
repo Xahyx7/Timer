@@ -16,7 +16,7 @@ body {
 
 .clock {
   display: flex;
-  gap: 32px;
+  gap: 36px;
 }
 
 .box-wrap {
@@ -28,24 +28,27 @@ body {
   justify-content: center;
 }
 
-/* ⭕ OUTER LOADING RING */
-.loader-ring {
+/* ⬛ BOX-SHAPED LOADING RING */
+.loader-box {
   position: absolute;
-  inset: -14px;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    rgba(255, 255, 255, 0.9) 40deg,
-    transparent 80deg
-  );
-  mask: radial-gradient(
-    farthest-side,
-    transparent calc(100% - 8px),
-    #000 calc(100% - 6px)
-  );
-  animation: spin 2.8s linear infinite;
-  opacity: 0.85;
+  inset: -16px;
+  border-radius: 30px;
+  background:
+    linear-gradient(90deg,
+      transparent 0%,
+      rgba(255,255,255,0.9) 50%,
+      transparent 100%);
+  animation: orbit 2.6s linear infinite;
+  opacity: 0.9;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  padding: 3px;
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
 }
 
 /* 📦 CLOCK BOX */
@@ -79,7 +82,8 @@ body {
   color: rgba(255, 255, 255, 0.6);
 }
 
-@keyframes spin {
+/* 🔄 ANIMATION */
+@keyframes orbit {
   to {
     transform: rotate(360deg);
   }
