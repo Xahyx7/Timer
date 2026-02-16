@@ -11,13 +11,45 @@ body {
   align-items: center;
   justify-content: center;
   font-family: "Segoe UI", system-ui, sans-serif;
+  overflow: hidden;
 }
 
 .clock {
   display: flex;
-  gap: 24px;
+  gap: 32px;
 }
 
+.box-wrap {
+  position: relative;
+  width: 200px;
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ⭕ OUTER LOADING RING */
+.loader-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      rgba(255,255,255,0.9) 40deg,
+      transparent 80deg
+    );
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 6px),
+    #000 calc(100% - 4px)
+  );
+  animation: spin 2.8s linear infinite;
+  opacity: 0.9;
+}
+
+/* 📦 INNER BOX */
 .box {
   width: 180px;
   height: 220px;
@@ -31,14 +63,7 @@ body {
   box-shadow:
     0 20px 40px rgba(0, 0, 0, 0.6),
     inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-  animation: float 6s ease-in-out infinite;
-}
-
-.box:nth-child(2) {
-  animation-delay: 0.5s;
-}
-.box:nth-child(3) {
-  animation-delay: 1s;
+  z-index: 1;
 }
 
 .number {
@@ -55,11 +80,9 @@ body {
   color: rgba(255, 255, 255, 0.6);
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
+/* 🎞️ ANIMATION */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
