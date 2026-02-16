@@ -8,6 +8,7 @@
 </head>
 <body>
 
+  <!-- ⏱️ CLOCK -->
   <div class="clock">
     <div class="box-wrap">
       <svg class="loader" viewBox="0 0 120 120">
@@ -36,6 +37,30 @@
       <div class="box">
         <span class="number" id="ss">00</span>
         <span class="label">SECONDS</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📊 ANALYTICS OVERLAY -->
+  <div class="overlay" id="overlay">
+    <div class="overlay-content">
+      <h2>Analytics</h2>
+
+      <div class="cards">
+        <div class="card">
+          <h3>Today</h3>
+          <p id="todayTime">0h 0m</p>
+        </div>
+
+        <div class="card">
+          <h3>This Week</h3>
+          <ul id="weekData"></ul>
+        </div>
+
+        <div class="card">
+          <h3>This Year</h3>
+          <ul id="yearData"></ul>
+        </div>
       </div>
     </div>
   </div>
