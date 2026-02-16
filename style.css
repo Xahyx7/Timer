@@ -29,10 +29,15 @@ body {
   justify-content: center;
 }
 
+/* 🔲 ANIMATED LOADER */
 .loader {
   position: absolute;
   width: 260px;
   height: 260px;
+}
+
+.loader.hidden {
+  display: none;
 }
 
 .loader rect {
@@ -110,7 +115,6 @@ body {
   padding: 20px;
 }
 
-/* EXPORT / IMPORT */
 .analytics-actions {
   margin-top: 28px;
   display: flex;
