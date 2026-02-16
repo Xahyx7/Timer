@@ -8,7 +8,7 @@ let startTime = null;
 let elapsed = 0;
 let rafId = null;
 
-/* 🔁 UPDATE DISPLAY */
+/* 🔁 RENDER TIME */
 function render(ms) {
   const totalSeconds = Math.floor(ms / 1000);
   const hours = Math.floor(totalSeconds / 3600);
@@ -35,26 +35,42 @@ function pause() {
   loaders.forEach(l => l.style.animationPlayState = "paused");
 }
 
-/* 🔄 LOOP */
+/* 🔄 RESET */
+function reset() {
+  cancelAnimationFrame(rafId);
+  running = false;
+  elapsed = 0;
+  startTime = null;
+  loaders.forEach(l => l.style.animationPlayState = "paused");
+  render(0);
+}
+
+/* 🔁 LOOP */
 function loop() {
   rafId = requestAnimationFrame(loop);
   elapsed = Date.now() - startTime;
   render(elapsed);
 }
 
-/* 💾 SAVE TO LOCALSTORAGE (BY DATE) */
+/* 💾 SAVE TIME */
 function saveTime(ms) {
+  if (ms <= 0) return;
   const today = new Date().toISOString().slice(0, 10);
   const data = JSON.parse(localStorage.getItem("focus-time") || "{}");
   data[today] = (data[today] || 0) + ms;
   localStorage.setItem("focus-time", JSON.stringify(data));
 }
 
-/* 🖱️ CLICK ANYWHERE */
+/* 🖱️ CLICK = START / PAUSE */
 document.body.addEventListener("click", () => {
   running = !running;
   running ? start() : pause();
 });
 
-/* ⏪ LOAD TODAY (OPTIONAL) */
+/* 🔁 DOUBLE CLICK = RESET */
+document.body.addEventListener("dblclick", () => {
+  reset();
+});
+
+/* INIT */
 render(0);
